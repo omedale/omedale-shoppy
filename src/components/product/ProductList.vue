@@ -3,23 +3,31 @@
   <div class="products">
     <div class="container">
       <template v-for="product in products">
-        <product-item :key="product.id" :product="product"></product-item>
+        <product-item @show-product-detail="showProductDetail" :key="product.id" :product="product"></product-item>
       </template>
     </div>
     <div class="row pagination-wrapper">
        <a-pagination  :defaultCurrent="1" :pageSize="10" @change="onPageChange" :current="current" :total="500" />
     </div>
   </div>
+  <product-detail
+    :product="product"
+    :showModal="showModal"
+    @close-product-detail="closeProductModal"
+  ></product-detail>
 </div>
 </template>
 
 <script>
 import ProductItem from './ProductItem.vue'
+import ProductDetail from './ProductDetail'
 export default {
   name: 'product-list',
   data () {
     return {
       current: 10,
+      showModal: false,
+      product: {},
       products: [{
         id: 'cghvjh567898',
         name: 'Vehoooo jchdkbhn 3cjbih kfbr3ckj cehbkjn bcrekjncik',
@@ -37,10 +45,19 @@ export default {
   methods: {
     onPageChange (current) {
       this.current = current
+    },
+    showProductDetail (product) {
+      this.product = product
+      this.showModal = true
+    },
+    closeProductModal () {
+      this.showModal = false
+      this.product = {}
     }
   },
   components: {
-    'product-item': ProductItem
+    'product-item': ProductItem,
+    'product-detail': ProductDetail
   }
 }
 </script>
