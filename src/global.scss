@@ -1,1 +1,25 @@
 @import '~bootstrap-css-only/css/bootstrap.min.css';
+
+.flex-space-between {
+  display: flex;
+  justify-content: space-between;
+}
+.ant-btn .anticon {
+  vertical-align: unset !important;
+}
+.filter-item {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.price-wrapper {
+  display: flex;
+}
+.price-input {
+  height: 24px;
+}
+.section-wrapper{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem !important;
+  margin-bottom: 1rem;
+}
