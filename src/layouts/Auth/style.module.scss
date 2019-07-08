@@ -1,0 +1,60 @@
+@import '../../assets/styles/mixins.scss';
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  background-color: $gray-lighten-more;
+  background-size: cover;
+  transition: background-image 0.4s linear;
+
+  @media (max-width: $sm-max-width) {
+    :global(.login-heading) {
+      display: none;
+    }
+  }
+
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: rem(50);
+  align-self: flex-start;
+  width: 100%;
+  padding: rem(40);
+
+  @media (max-width: $md-max-width) {
+    padding: rem(40) rem(20) rem(40);
+  }
+
+  @media screen and (max-width: $sm-max-width) {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+}
+
+.content {
+  align-self: middle;
+}
+
+.footer {
+  align-self: flex-end;
+  width: 100%;
+  color: $text;
+  padding: rem(40);
+
+  @media (max-width: $md-max-width) {
+    padding: rem(40) rem(20) rem(40);
+  }
+
+  @media (max-width: $sm-max-width) {
+    padding: rem(40) rem(20) rem(20);
+  }
+}
