@@ -1,5 +1,6 @@
 @import '~bootstrap-css-only/css/bootstrap.min.css';
 
+
 .flex-space-between {
   display: flex;
   justify-content: space-between;
@@ -22,4 +23,28 @@
   padding-bottom: 1rem;
   box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem !important;
   margin-bottom: 1rem;
+}
+
+.ant-form-item {
+  margin-bottom: 0 !important;
+}
+
+.ant-form-item-label {
+  margin-bottom: 0 !important;
+}
+
+.action-buttons-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.action-buttons-space-between {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.anchor-button {
+  text-decoration: none !important;
 }
