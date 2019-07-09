@@ -9,10 +9,10 @@
         <div class="card-product ">
           <div class="info-wrap">
             <a href="#" class="title">
-              <div class="text-center">{{product.name}}</div>
+              <div class="product-name text-center">{{product.name}}</div>
             </a>
             <div class="price-wrap text-center">
-              <span class="price-new"> ${{product.price}}</span>
+              <span class="price-new product-price"> ${{product.price}}</span>
             </div>
           </div>
           <div class="flex-space-between">
@@ -74,5 +74,12 @@ export default {
 }
  .product-info {
   flex: 2;
+}
+.product-price {
+  font-size: large;
+  color: #1ca57a;
+}
+ .product-name {
+  color: rgba(0, 0, 0, 0.65);
 }
 </style>

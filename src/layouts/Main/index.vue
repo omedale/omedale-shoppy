@@ -3,7 +3,6 @@
   <header-component></header-component>
   <section class="">
     <div class="container">
-      <filter-component></filter-component>
       <router-view />
     </div>
   </section>
@@ -14,7 +13,6 @@
 <script>
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
-import Filter from '@/components/common/Filter'
 export default {
   name: 'MainLayout',
   data () {
@@ -25,8 +23,7 @@ export default {
   },
   components: {
     'header-component': Header,
-    'footer-component': Footer,
-    'filter-component': Filter
+    'footer-component': Footer
   }
 }
 </script>

@@ -1,3 +1,4 @@
+
 <template>
 <div>
   <header class="section-header">
@@ -9,9 +10,11 @@
           </div>
           <div class="col-lg-6 col-sm-12">
             <div class="float-right no-gutters py-1">
-              <a href="#" class="">
-                  <a-icon type="shopping-cart" />
-                </a>
+              <router-link :to="'/cart'" class="">
+                  <span>
+                    <a-badge :count="1"><a-avatar shape="square" icon="shopping-cart" /></a-badge>
+                  </span>
+              </router-link>
             </div>
           </div>
         </div>
