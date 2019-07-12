@@ -2,10 +2,11 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import MainLayout from '@/layouts/Main'
 import AuthLayout from '@/layouts/Auth'
+import store from '@/store'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -22,7 +23,8 @@ export default new Router({
         },
         {
           path: '/checkout',
-          component: () => import('./views/checkout')
+          component: () => import('./views/checkout'),
+          meta: { requiresAuth: true }
         }
       ]
     },
@@ -43,3 +45,21 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    console.log(store.state.customer.customer)
+    if (!store.state.customer.customer) {
+      next({
+        path: '/customer/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+ export default router

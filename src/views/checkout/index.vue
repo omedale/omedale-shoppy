@@ -214,6 +214,8 @@
           :cardnumber="'4242 4242 4242 4242'"
           :email="'omedale@gmail.com'"
           :allow-remember-me="false"
+          @done="done"
+          @opened="opened"
           @closed="closed"
           @canceled="canceled"
         ></vue-stripe-checkout>
@@ -270,6 +272,16 @@ export default {
       // do stuff
     },
     canceled () {
+      // do stuff
+    },
+    done ({token, args}) {
+      // token - is the token object
+      // args - is an object containing the billing and shipping address if enabled
+      // do stuff...
+      console.log(token)
+      console.log(args)
+    },
+    opened () {
       // do stuff
     }
   },

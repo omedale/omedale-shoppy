@@ -7,6 +7,7 @@
         <div :class="$style.header">
           <div :class="$style.logo">
             <router-link to="/">
+              Home
             </router-link>
           </div>
         </div>
