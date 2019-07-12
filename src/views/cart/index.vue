@@ -197,7 +197,7 @@ export default {
   font-size: 16px;
   color: #333a45;
   border-radius: 3px;
-  padding: 30px;
+  padding: 0.75rem;
 }
 .cart-line {
   display: flex;

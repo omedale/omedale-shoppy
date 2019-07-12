@@ -2,6 +2,7 @@
 <div class="row">
   <div class="col-sm-6 offset-sm-3 text-center">
        <h1 class="display-4">Register</h1>
+        <a-alert v-if="errorMessage" :message="errorMessage" type="error" showIcon />
        <a-form
           id="components-form-demo-normal-login"
           :form="form"
@@ -69,8 +70,10 @@
               type="primary"
               html-type="submit"
               class="login-form-button"
+              :disabled="loading"
             >
-              Register
+              <span v-if="loading">Please Wait ...</span>
+              <span v-else>Register</span>
             </a-button>
             Or <router-link :to="'/customer/login'">
               Login
@@ -82,21 +85,23 @@
 </template>
 
 <script>
+import authMixin from '@/mixins/auth.js'
 export default {
   name: 'Register',
+  mixins: [authMixin],
   data () {
     return {
+      form: this.$form.createForm(this),
+      loading: false,
+      errorMessage: ''
     }
-  },
-  beforeCreate () {
-    this.form = this.$form.createForm(this)
   },
   methods: {
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log('Received values of form: ', values)
+          this.authCustomer(values, 'register')
         }
       })
     }
