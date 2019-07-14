@@ -60,3 +60,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+  input {
+    border-radius: 12px !important;
+  }
+</style>

@@ -4,7 +4,7 @@
     <div @click="showProductDetail" class="product-link">
       <div class="product-image">
         <img
-            class="img-responsive" :src="product.image" alt="">
+            class="img-responsive" :src="getImgUrl(product.image)">
         </div>
         <div class="card-product ">
           <div class="info-wrap">
@@ -39,6 +39,9 @@ export default {
   methods: {
     showProductDetail () {
       this.$emit('show-product-detail', this.product)
+    },
+    getImgUrl (imageName) {
+      return require(`../../assets/product_images/${imageName}`)
     }
   }
 }

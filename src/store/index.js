@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import customer from './customer'
+import product from './product'
 
 Vue.use(Vuex)
 
@@ -10,7 +11,8 @@ export default new Vuex.Store({
     createPersistedState()
   ],
   modules: {
-    customer
+    customer,
+    product
   },
   state: {},
   mutations: {},

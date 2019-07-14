@@ -2,7 +2,7 @@
 <div>
   <header-component></header-component>
   <section class="">
-    <div class="container">
+    <div class="container  content-wrapper">
       <router-view />
     </div>
   </section>
@@ -27,3 +27,13 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .content-wrapper {
+    margin-top: 100px;
+  }
+  @media screen and (max-width: 992px) {
+    .content-wrapper {
+      margin-top: 140px;
+    }
+  }
+</style>
