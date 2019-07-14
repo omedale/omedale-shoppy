@@ -3,10 +3,6 @@
   <div class="cart">
     <h1 class="title">
       Order
-      <span>
-          <span class="language" @click="language = 'en-US'">English</span>
-      <span class="language" @click="language = 'fr-FR'">French</span>
-      </span>
     </h1>
   </div>
   <div class="table-wrapper">
@@ -170,6 +166,9 @@ export default {
   overflow: auto;
   height: auto;
 }
+.ant-btn-group > .ant-btn:last-child:not(:first-child), .ant-btn-group > span:last-child:not(:first-child) > .ant-btn, .ant-btn-group > .ant-btn:first-child:not(:last-child), .ant-btn-group > span:first-child:not(:last-child) > .ant-btn{
+  border-radius: 12px;
+}
 .title {
   display: flex;
   justify-content: space-between;
@@ -192,12 +191,16 @@ export default {
   list-style: none;
 }
 .cart {
-  background: #fff;
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem !important;
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   color: #333a45;
   border-radius: 3px;
   padding: 0.75rem;
+}
+input {
+   border-radius: 12px !important;
+   max-width: 50px !important;
 }
 .cart-line {
   display: flex;

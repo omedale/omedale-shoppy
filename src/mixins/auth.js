@@ -16,7 +16,8 @@ export default {
         const customer = response.data.customer.schema
         const token = response.data.accessToken
         store.commit('UPDATE_CUSTOMER_INFO', { customer, token })
-        this.$router.push({ path: '/' })
+        const nextRoute = this.$route.query.redirect || '/'
+        this.$router.replace(nextRoute)
       } else {
         this.errorMessage = response.data.error ? response.data.error.message : ''
       }

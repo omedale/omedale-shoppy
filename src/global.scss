@@ -1,12 +1,29 @@
 @import '~bootstrap-css-only/css/bootstrap.min.css';
+@import url('https://fonts.googleapis.com/css?family=Merienda&display=swap');
 
+body {
+  background: #e5e5e5;
+}
 
 .flex-space-between {
   display: flex;
   justify-content: space-between;
 }
 .ant-btn .anticon {
-  vertical-align: unset !important;
+  vertical-align: 0.08rem !important;
+}
+.flex-pull-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.flex-pull-left {
+  display: flex;
+  justify-content: flex-start;
+}
+.card-body{
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem !important;
+  background: #e5e5e5;
 }
 .filter-item {
   margin-left: 3px;
@@ -23,10 +40,19 @@
   padding-bottom: 1rem;
   box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem !important;
   margin-bottom: 1rem;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 100;
+  background: #e5e5e5;
 }
 
 .ant-form-item {
   margin-bottom: 0 !important;
+}
+
+.ant-select-selection, .ant-radio-button-wrapper, .ant-radio-button-wrapper:first-child, .ant-radio-button-wrapper:last-child {
+  border-radius: 12px;
 }
 
 .ant-form-item-label {
@@ -45,6 +71,25 @@
   margin-bottom: 20px;
 }
 
+a {
+  text-decoration: none !important;
+  &:hover {
+    text-decoration: none !important;
+  }
+}
+
 .anchor-button {
   text-decoration: none !important;
+}
+
+.anticon {
+  vertical-align: unset;
+}
+
+.primary-color {
+  color: #1DA57A !important;
+}
+
+.ant-btn-primary {
+  border-radius: 12px;
 }

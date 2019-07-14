@@ -266,7 +266,6 @@ export default {
       const { token, args } = await this.$refs.checkoutRef.open()
       console.log(token)
       console.log(args)
-      console.log('....................')
     },
     closed () {
       // do stuff

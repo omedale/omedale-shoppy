@@ -1,13 +1,13 @@
 <template>
 <div>
   <div class="products">
-    <div class="container">
+    <div class="row">
       <template v-for="product in products">
         <product-item @show-product-detail="showProductDetail" :key="product.id" :product="product"></product-item>
       </template>
     </div>
     <div class="row pagination-wrapper">
-       <a-pagination  :defaultCurrent="1" :pageSize="10" @change="onPageChange" :current="current" :total="500" />
+       <a-pagination  :defaultCurrent="1" :pageSize="20" @change="onPageChange" :current="currentPage" :total="totalProducts" />
     </div>
   </div>
   <product-detail
@@ -19,28 +19,25 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import ProductItem from './ProductItem.vue'
 import ProductDetail from './ProductDetail'
+import productService from '@/services/product'
+import store from '@/store'
 export default {
   name: 'product-list',
   data () {
     return {
-      current: 10,
+      current: 1,
       showModal: false,
-      product: {},
-      products: [{
-        id: 'cghvjh567898',
-        name: 'Vehoooo jchdkbhn 3cjbih kfbr3ckj cehbkjn bcrekjncik',
-        manufacturer: {
-          name: 'Nissan'
-        },
-        price: 200,
-        image: 'https://taaimages.s3.eu-west-2.amazonaws.com/1539772138.jpg'
-      }]
+      product: {}
     }
   },
+  computed: {
+    ...mapGetters(['products', 'totalProducts', 'currentPage'])
+  },
   created () {
-    console.log(this.products)
+    this.getProducts()
   },
   methods: {
     onPageChange (current) {
@@ -53,6 +50,14 @@ export default {
     closeProductModal () {
       this.showModal = false
       this.product = {}
+    },
+    async getProducts () {
+      const response = await productService.getProducts(this.current)
+      if (response.status === 200 && response.data && response.data.rows) {
+        const data = response.data
+        const currentPage = this.current
+        store.commit('ADD_PRODUCTS', { data, currentPage })
+      }
     }
   },
   components: {
@@ -64,8 +69,10 @@ export default {
 
 <style>
 .products {
-  background: #F7F8FB;
+  background: #e5e5e5;
   padding: 30px 0;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 .pagination-wrapper {
   justify-content: center;
