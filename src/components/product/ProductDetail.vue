@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-modal
-      title="Basic Modal"
+      :title="product.name"
       v-model="showModal"
       :closable="false"
       @ok="closeProductModal"
@@ -10,28 +10,25 @@
         <div class="col-md-6">
            <a-carousel arrows dotsClass="slick-dots slick-thumb">
               <a slot="customPaging" slot-scope="props">
-                <img :src="getImgUrl(props.i)" />
+                <img :src="getImg(props.i)" />
               </a>
-              <div :key="item" v-for="item in 9">
-                <img :src="imgUrl" />
+              <div :key="image" v-for="image in images">
+                <img :src="getImgUrl(image)" />
               </div>
             </a-carousel>
+            <p>{{product.description}}</p>
         </div>
         <div class="col-md-6">
           <div class="detail-filter-item">
-            <strong>{{product.name}}</strong>
-          </div>
-          <div class="detail-filter-item">
-            <strong>{{product.price}}</strong>
+            <strong>price:</strong>
+            <strong v-if="product.discounted_price > 0">${{product.discounted_price}}</strong>
+             <strong v-else>${{product.price}}</strong>
           </div>
           <div class="detail-filter-item">
           <strong>Color</strong>
           <div>
             <a-radio-group :size="'small'">
-              <a-radio-button value="a">&nbsp; &nbsp;</a-radio-button>
-              <a-radio-button value="b">&nbsp; &nbsp;</a-radio-button>
-              <a-radio-button value="c">&nbsp; &nbsp;</a-radio-button>
-              <a-radio-button value="d">&nbsp; &nbsp;</a-radio-button>
+              <a-radio-button :key="color.value" v-for="color in colors"  v-bind:style="{ background: `${color.value} !important` }" :value="color.value">&nbsp; &nbsp;</a-radio-button>
             </a-radio-group>
           </div>
           </div>
@@ -39,10 +36,7 @@
             <strong>Size</strong>
             <div>
               <a-radio-group size="small">
-                <a-radio-button value="a">Hangzhou</a-radio-button>
-                <a-radio-button value="b">Shanghai</a-radio-button>
-                <a-radio-button value="c">Beijing</a-radio-button>
-                <a-radio-button value="d">Chengdu</a-radio-button>
+                <a-radio-button :key="size.value" v-for="size in sizes" :value="size.value">{{size.value}}</a-radio-button>
               </a-radio-group>
             </div>
           </div>
@@ -51,13 +45,13 @@
             <div>
               <a-row size="small">
                 <a-col :span="3">
-                  <a-button shape="circle" icon="minus" :size="'small'" />
+                  <a-button shape="circle" @click="updateQuatity(-1)" icon="minus" :size="'small'" />
                 </a-col>
                 <a-col class="mr-2 ml-2" :span="6">
-                  <a-input size="small" defaultValue="0571" />
+                  <a-input class="quantity" size="small" v-model="quantity" type="number" min="0" defaultValue="0" />
                 </a-col>
                 <a-col :span="3">
-                  <a-button class=""  shape="circle" icon="plus" :size="'small'" />
+                  <a-button class="" @click="updateQuatity(1)" shape="circle" icon="plus" :size="'small'" />
                 </a-col>
               </a-row>
             </div>
@@ -77,29 +71,36 @@
 <script>
 export default {
   name: 'ProductDetail',
-  props: ['showModal', 'product'],
+  props: ['showModal', 'product', 'images', 'colors', 'sizes'],
   data () {
     return {
-      imgUrl: 'http://res.cloudinary.com/ixosft/image/upload/v1559509948/x8r1xzb68rz5plqqbtia.png'
+      quantity: 0
     }
   },
   methods: {
     closeProductModal (e) {
       this.$emit('close-product-detail')
     },
-    getImgUrl (i) {
-      return this.imgUrl
+    getImg (i) {
+      return require(`../../assets/product_images/${this.images[i]}`)
+    },
+    updateQuatity (value) {
+      this.quantity = Math.max(0, this.quantity + value)
+    },
+    getImgUrl (imageName) {
+      return require(`../../assets/product_images/${imageName}`)
     }
   }
 }
 </script>
 <style scoped>
 .ant-carousel {
-  margin-bottom: 45px !important;
+  margin-bottom: 55px !important;
 }
 .ant-carousel >>> .slick-dots {
   height: auto;
   display: flex !important;
+  justify-content: center;
 }
 .ant-carousel >>> .slick-slide img{
     border: 5px solid #FFF;
@@ -133,5 +134,12 @@ export default {
 }
 .add-to-cart-btn {
   margin-top: 5px;
+}
+.ant-radio-button-wrapper:not(:first-child)::before {
+  background-color: unset;
+}
+.quantity {
+  border-radius: 12px;
+  text-align: center;
 }
 </style>

@@ -22,10 +22,9 @@ export default {
     customer: state => state.customer,
     customerToken: state => state.token,
     isTokenValid: state => {
-      const now = moment()
+      const now = moment(new Date())
       const next24Hour = state.tokenExpIN ? new Date(state.tokenExpIN) : null
-      const isValid = next24Hour ? now.diff(moment(new Date(next24Hour)), 'days') : null
-      return isValid === 0
+      return now < moment(new Date(next24Hour))
     }
   }
 }

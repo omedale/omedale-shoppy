@@ -12,6 +12,9 @@
   </div>
   <product-detail
     :product="product"
+    :images="images"
+    :colors="colors"
+    :sizes="sizes"
     :showModal="showModal"
     @close-product-detail="closeProductModal"
   ></product-detail>
@@ -22,28 +25,43 @@
 import { mapGetters } from 'vuex'
 import ProductItem from './ProductItem.vue'
 import ProductDetail from './ProductDetail'
-import productService from '@/services/product'
+import productMixin from '@/mixins/product'
 import store from '@/store'
 export default {
   name: 'product-list',
+  mixins: [productMixin],
   data () {
     return {
       current: 1,
       showModal: false,
-      product: {}
+      product: {},
+      isLoading: false,
+      images: []
     }
   },
-  computed: {
-    ...mapGetters(['products', 'totalProducts', 'currentPage'])
-  },
   created () {
+    const queryPage = this.$router.history.current.query.page || 1
+    if (this.$router.history.current.query.q) {
+      const searchWord = this.$router.history.current.query.q
+      store.commit('UPDATE_SEARCH_WORD', { searchWord })
+    } else {
+      const searchWord = ''
+      store.commit('UPDATE_SEARCH_WORD', { searchWord })
+    }
+    this.current = parseInt(queryPage)
     this.getProducts()
   },
   methods: {
     onPageChange (current) {
       this.current = current
+      this.getProducts()
+      const query = this.searchWord ? {q: this.searchWord, page: this.current} : {page: this.current}
+      this.$router.push({query: query})
     },
     showProductDetail (product) {
+      this.images = []
+      this.images.push(product.image)
+      this.images.push(product.image_2)
       this.product = product
       this.showModal = true
     },
@@ -51,14 +69,13 @@ export default {
       this.showModal = false
       this.product = {}
     },
-    async getProducts () {
-      const response = await productService.getProducts(this.current)
-      if (response.status === 200 && response.data && response.data.rows) {
-        const data = response.data
-        const currentPage = this.current
-        store.commit('ADD_PRODUCTS', { data, currentPage })
-      }
+    getProducts () {
+      const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
+      this.findProdcut(this.searchWord, findType)
     }
+  },
+  computed: {
+    ...mapGetters(['products', 'totalProducts', 'currentPage'])
   },
   components: {
     'product-item': ProductItem,
