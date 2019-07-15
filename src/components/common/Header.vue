@@ -31,7 +31,7 @@
               <span class="no-gutters cart py-1">
                 <router-link :to="'/cart'" class="link">
                     <span>
-                      <a-badge :count="1"><a-avatar shape="square" icon="shopping-cart" /></a-badge>
+                      <a-badge :count="totalItem"><a-avatar shape="square" icon="shopping-cart" /></a-badge>
                     </span>
                 </router-link>
               </span>
@@ -48,6 +48,7 @@
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import productMixin from '@/mixins/product'
+import CartService from '@/services/cart'
 export default {
   name: 'header',
   mixins: [productMixin],
@@ -57,12 +58,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['customer']),
+    ...mapGetters(['customer', 'isTokenValid', 'cartId', 'isValidCartId']),
     customerName () {
       return this.customer ? this.customer.name : ''
     }
   },
-  mounted () {
+  created () {
+    if (!this.isTokenValid) {
+      this.logout()
+    }
+    this.getCarts()
   },
   methods: {
     onSearch (searchWord) {
@@ -73,6 +78,15 @@ export default {
         this.$router.push({query: {
           q: searchWord
         }})
+      }
+    },
+    async getCarts () {
+      if (this.cartId && this.isValidCartId) {
+        const response = await CartService.getAllCartItem(this.cartId)
+        if (response.status === 200 && response.data) {
+          const carts = response.data
+          store.commit('ADD_CARTS', { carts })
+        }
       }
     },
     onSearchChange (event) {

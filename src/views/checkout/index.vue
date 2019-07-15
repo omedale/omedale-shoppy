@@ -7,51 +7,30 @@
         <div class="col-md-4 order-md-2 mb-4">
           <h4 class="d-flex justify-content-between align-items-center mb-3">
             <span class="text-muted">Your cart</span>
-            <span class="badge badge-secondary badge-pill">3</span>
+            <span class="badge badge-secondary badge-pill">{{totalItem}}</span>
           </h4>
           <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <li :key="item.item_id" v-for="item in carts" class="list-group-item d-flex justify-content-between lh-condensed">
               <div>
-                <h6 class="my-0">Product name</h6>
-                <small class="text-muted">Brief description</small>
+                <h6 class="my-0">{{ item.name }}</h6>
+                <small class="text-muted">Quantity ({{ item.quantity }})</small>
               </div>
-              <span class="text-muted">$12</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
-              <div>
-                <h6 class="my-0">Second product</h6>
-                <small class="text-muted">Brief description</small>
-              </div>
-              <span class="text-muted">$8</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
-              <div>
-                <h6 class="my-0">Third item</h6>
-                <small class="text-muted">Brief description</small>
-              </div>
-              <span class="text-muted">$5</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between bg-light">
-              <div class="text-success">
-                <h6 class="my-0">Promo code</h6>
-                <small>EXAMPLECODE</small>
-              </div>
-              <span class="text-success">-$5</span>
+              <span  v-if="item.discounted_price > 0" class="text-muted">{{ toPrice(item.discounted_price).toFormat() }}</span>
+              <span  v-else class="text-muted">{{ toPrice(item.price).toFormat() }}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between">
-              <span>Total (USD)</span>
-              <strong>$20</strong>
+              <span>Tax</span>
+              <strong>{{ getTaxAmount.toFormat() }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Shipping fee</span>
+              <strong>$ {{ shippingFee }}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total</span>
+              <strong>{{ getTotal.toFormat() }}</strong>
             </li>
           </ul>
-
-           <form class="card p-2">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Promo code">
-              <div class="input-group-append">
-                <button type="submit" class="btn btn-secondary">Redeem</button>
-              </div>
-            </div>
-          </form>
         </div>
         <div class="col-md-8 order-md-1">
           <h4 class="mb-3">Billing address</h4>
@@ -117,37 +96,38 @@
              <a-row>
                 <a-col :span="10">
                   <a-form-item
-                    label="Country"
+                    label="Region"
                     has-feedback
                     >
                       <a-select
+                        @change="getShipping"
                         v-decorator="[
-                          'country',
-                          {rules: [{ required: true, message: 'Please select your country!' }]}
+                          'region',
+                          {rules: [{ required: true, message: 'Please select your region!' }]}
                         ]"
-                        placeholder="Please select a country"
-                        @change="getStates"
+                        placeholder="Please select a region"
                       >
-                        <a-select-option :key="country.countryName" v-for="country in countries" :value="JSON.stringify(country)">
-                          {{country.countryName}}
+                        <a-select-option :key="region.shipping_region_id" v-for="region in regions" :value="JSON.stringify(region)">
+                          {{region.shipping_region}}
                         </a-select-option>
                       </a-select>
                     </a-form-item>
-                  </a-col>
+                </a-col>
                 <a-col :span="8">
                   <a-form-item
-                    label="State"
+                    label="Shipping"
                     has-feedback
                     >
                       <a-select
                         v-decorator="[
                           'state',
-                          {rules: [{ required: true, message: 'Please select your state!' }]}
+                          {rules: [{ required: true, message: 'Please select shipping!' }]}
                         ]"
-                        placeholder="Please select a state"
+                        placeholder="Please select shipping"
+                        @change="setShipping"
                       >
-                        <a-select-option :key="state.adminName1" v-for="state in states" :value="JSON.stringify(state)">
-                          {{ state.adminName1 }}
+                        <a-select-option :key="shipping.shipping_id" v-for="shipping in shippings" :value="JSON.stringify(shipping)">
+                          {{ shipping.shipping_type }}
                         </a-select-option>
                       </a-select>
                     </a-form-item>
@@ -211,7 +191,6 @@
           :description="'Payment'"
           :currency="'USD'"
           :amount="20"
-          :cardnumber="'4242 4242 4242 4242'"
           :email="'omedale@gmail.com'"
           :allow-remember-me="false"
           @done="done"
@@ -219,73 +198,73 @@
           @closed="closed"
           @canceled="canceled"
         ></vue-stripe-checkout>
-      </div>
+    </div>
 </div>
 </template>
 <script>
-import Geonames from 'geonames.js'
-const geonames = new Geonames({username: 'omedale', lan: 'en', encoding: 'JSON'})
+import cartMixin from '@/mixins/cart'
+import ConfigService from '@/services/config'
+import store from '@/store'
 export default {
   name: 'Checkout',
+  mixins: [cartMixin],
   data () {
     return {
-      countries: [],
-      states: []
+      shippings: [],
+      form: this.$form.createForm(this),
+      shippingId: 0,
+      shippingFee: 0
     }
   },
-  beforeCreate () {
-    this.form = this.$form.createForm(this)
-  },
   methods: {
+    getShipping (region) {
+      const currentRegion = JSON.parse(region)
+      this.shippings = currentRegion.shippings
+    },
+    setShipping (shipping) {
+      const shippingData = JSON.parse(shipping)
+      this.shippingId = shippingData.shipping_id
+      this.shippingFee = shippingData.shipping_cost
+    },
     pay (e) {
       e.preventDefault()
       const vm = this
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          console.log('Received values of form: ', values)
           vm.checkout()
         }
       })
     },
-    async getStates (value) {
-      const country = JSON.parse(value)
-      const response = await geonames.children({geonameId: country.geonameId})
-      if (response.geonames) {
-        this.states = response.geonames
-      }
-    },
-    async setCountries () {
-      const response = await geonames.countryInfo({})
-      if (response.geonames) {
-        this.countries = response.geonames
+    async getCheckOutData () {
+      const response = await ConfigService.getCheckOutData()
+      if (response.status === 200 && response.data.tax) {
+        const data = response.data
+        store.commit('ADD_CHECKOUT_DATA', { data })
       }
     },
     async checkout () {
-      // token - is the token object
-      // args - is an object containing the billing and shipping address if enabled
       const { token, args } = await this.$refs.checkoutRef.open()
       console.log(token)
       console.log(args)
+    },
+    done ({token, args}) {
+      console.log(token)
+      console.log(args)
+    },
+    opened () {
+      // do stuff
     },
     closed () {
       // do stuff
     },
     canceled () {
       // do stuff
-    },
-    done ({token, args}) {
-      // token - is the token object
-      // args - is an object containing the billing and shipping address if enabled
-      // do stuff...
-      console.log(token)
-      console.log(args)
-    },
-    opened () {
-      // do stuff
     }
   },
-  mounted () {
-    this.setCountries()
+  created () {
+    if (this.regions.length === 0) {
+      this.getCheckOutData()
+    }
   }
 }
 </script>

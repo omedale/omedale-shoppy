@@ -1,9 +1,11 @@
 <template>
   <div>
     <a-modal
+      :width="600"
       :title="product.name"
       v-model="showModal"
       :closable="false"
+      :footer="null"
       @ok="closeProductModal"
     >
       <div class="row">
@@ -27,7 +29,7 @@
           <div class="detail-filter-item">
           <strong>Color</strong>
           <div>
-            <a-radio-group :size="'small'">
+            <a-radio-group v-model="color" :size="'small'">
               <a-radio-button :key="color.value" v-for="color in colors"  v-bind:style="{ background: `${color.value} !important` }" :value="color.value">&nbsp; &nbsp;</a-radio-button>
             </a-radio-group>
           </div>
@@ -35,30 +37,21 @@
           <div class="detail-filter-item">
             <strong>Size</strong>
             <div>
-              <a-radio-group size="small">
+              <a-radio-group v-model="size" size="small">
                 <a-radio-button :key="size.value" v-for="size in sizes" :value="size.value">{{size.value}}</a-radio-button>
               </a-radio-group>
             </div>
           </div>
-          <div class="detail-filter-item">
-            <strong>Quantity</strong>
-            <div>
-              <a-row size="small">
-                <a-col :span="3">
-                  <a-button shape="circle" @click="updateQuatity(-1)" icon="minus" :size="'small'" />
-                </a-col>
-                <a-col class="mr-2 ml-2" :span="6">
-                  <a-input class="quantity" size="small" v-model="quantity" type="number" min="0" defaultValue="0" />
-                </a-col>
-                <a-col :span="3">
-                  <a-button class="" @click="updateQuatity(1)" shape="circle" icon="plus" :size="'small'" />
-                </a-col>
-              </a-row>
-            </div>
-          </div>
            <div class="detail-filter-item">
+             <strong>Description</strong>
+              <p>{{product.description}}</p>
               <a-button class="add-to-cart-btn" type="primary">Add to cart</a-button>
            </div>
+            <a-alert v-if="errorMessage" :message="errorMessage" type="error" showIcon />
+            <div class="detail-filter-item">
+              <a-button :disabled="loading" @click="addToCart" class="add-to-cart-btn" type="primary">Add to cart</a-button>
+              <a-button key="back" @click="closeProductModal">Return</a-button>
+            </div>
         </div>
       </div>
       <template slot="footer">
@@ -69,12 +62,17 @@
 </template>
 
 <script>
+import cartMixin from '@/mixins/cart'
 export default {
   name: 'ProductDetail',
   props: ['showModal', 'product', 'images', 'colors', 'sizes'],
+  mixins: [cartMixin],
   data () {
     return {
-      quantity: 0
+      loading: false,
+      color: '',
+      size: '',
+      errorMessage: ''
     }
   },
   methods: {
@@ -84,8 +82,17 @@ export default {
     getImg (i) {
       return require(`../../assets/product_images/${this.images[i]}`)
     },
-    updateQuatity (value) {
-      this.quantity = Math.max(0, this.quantity + value)
+    addToCart () {
+      const data = {
+        cart_id: this.cartId,
+        product_id: this.product.product_id,
+        attributes: `${this.color}, ${this.size}`
+      }
+      if (!this.color || !this.size) {
+        this.errorMessage = 'Please select color and size'
+        return
+      }
+      this.addOrUpdateCart(data, 1)
     },
     getImgUrl (imageName) {
       return require(`../../assets/product_images/${imageName}`)
@@ -137,9 +144,5 @@ export default {
 }
 .ant-radio-button-wrapper:not(:first-child)::before {
   background-color: unset;
-}
-.quantity {
-  border-radius: 12px;
-  text-align: center;
 }
 </style>

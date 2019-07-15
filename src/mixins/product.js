@@ -3,7 +3,7 @@ import ProductService from '@/services/product'
 import store from '@/store'
 export default {
   computed: {
-    ...mapGetters(['departments', 'categories', 'sizes', 'colors',
+    ...mapGetters(['departments', 'categories', 'sizes', 'colors', 'totalItem',
       'filterByPriceRange', 'filterByCategoryIds', 'filterByDepartmentIds', 'searchWord',
       'isValidCartId'])
   },

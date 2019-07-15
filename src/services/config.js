@@ -9,5 +9,14 @@ export default {
       .catch(error => {
         return error.response
       })
+  },
+  getCheckOutData () {
+    return Api().get(`api/config/checkout-data`)
+      .then(response => {
+        return response
+      })
+      .catch(error => {
+        return error.response
+      })
   }
 }
