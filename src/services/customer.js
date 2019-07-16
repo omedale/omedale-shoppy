@@ -18,5 +18,14 @@ export default {
       .catch(error => {
         return error.response
       })
+  },
+  updateAddress (data) {
+    return Api().put(`api/customers/address`, data)
+      .then(resp => {
+        return resp
+      })
+      .catch(error => {
+        return error.response
+      })
   }
 }

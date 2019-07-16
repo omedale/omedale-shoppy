@@ -15,6 +15,9 @@ export default {
       state.customer = customer
       state.token = token
       state.tokenExpIN = customer ? moment.utc().add(1, 'day').format('YYYY,MM-DD HH:mm:ss') : null
+    },
+    UPDATE_CUSTOMER (state, { customer }) {
+      state.customer = customer
     }
   },
   actions: {},

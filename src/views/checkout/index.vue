@@ -36,7 +36,7 @@
           <h4 class="mb-3">Billing address</h4>
            <a-form
             :form="form"
-            @submit="pay"
+            @submit="makeOrder"
             >
             <a-form-item
             label="Name">
@@ -46,7 +46,8 @@
                   {
                     rules: [{
                       required: true, message: 'Please input your name!',
-                    }]
+                    }],
+                    initialValue: (customer.name || '')
                   }
                 ]"
                 placeholder="Name"
@@ -64,35 +65,81 @@
                       type: 'email', message: 'The input is not valid E-mail!',
                     }, {
                       required: true, message: 'Please input your E-mail!',
-                    }]
+                    }],
+                    initialValue: (customer.email || '')
                   }
                 ]"
                  placeholder="your@email.com"
               />
             </a-form-item>
-            <a-form-item
-              label="Address">
-              <a-input
-                  v-decorator="[
-                    'address',
-                    {
-                      rules: [{
-                        required: true, message: 'Please input your Address!',
-                      }]
-                    }
-                  ]"
-                  placeholder="23 Suxxess pile way"
-                >
-                </a-input>
-            </a-form-item>
-            <a-form-item
-              label="Address 2 (optional)">
-              <a-input
-                 v-decorator="['address2']"
-                  placeholder="Apartment or Flat"
-                >
-                </a-input>
-            </a-form-item>
+             <a-row>
+                <a-col :span="12">
+                  <a-form-item
+                    label="Address">
+                    <a-input
+                        v-decorator="[
+                          'address',
+                          {
+                            rules: [{
+                              required: true, message: 'Please input your Address!',
+                            }],
+                            initialValue: (customer.address_1 || '')
+                          }
+                        ]"
+                        placeholder="23 Suxxess pile way"
+                      >
+                      </a-input>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="12">
+                  <a-form-item
+                    label="Address 2 (optional)">
+                    <a-input
+                      v-decorator="['address2', {initialValue: (customer.address_1 || '')}]"
+                        placeholder="Apartment or Flat"
+                      >
+                      </a-input>
+                  </a-form-item>
+                </a-col>
+             </a-row>
+             <a-row>
+                <a-col :span="12">
+                  <a-form-item
+                    label="City">
+                    <a-input
+                        v-decorator="[
+                          'city',
+                          {
+                            rules: [{
+                              required: true, message: 'Please input city!',
+                            }],
+                            initialValue: (customer.city || '')
+                          }
+                        ]"
+                        placeholder="New York"
+                      >
+                      </a-input>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="12">
+                  <a-form-item
+                    label="Country">
+                    <a-input
+                        v-decorator="[
+                          'country',
+                          {
+                            rules: [{
+                              required: true, message: 'Please input country!',
+                            }],
+                            initialValue: (customer.country || '')
+                          }
+                        ]"
+                        placeholder="USA"
+                      >
+                      </a-input>
+                  </a-form-item>
+                </a-col>
+             </a-row>
              <a-row>
                 <a-col :span="10">
                   <a-form-item
@@ -120,7 +167,7 @@
                     >
                       <a-select
                         v-decorator="[
-                          'state',
+                          'shipping',
                           {rules: [{ required: true, message: 'Please select shipping!' }]}
                         ]"
                         placeholder="Please select shipping"
@@ -134,14 +181,15 @@
                 </a-col>
                 <a-col :span="6">
                    <a-form-item
-                    label="Zip Code">
+                    label="Postal Code">
                     <a-input
                         v-decorator="[
                           'zip',
                           {
                             rules: [{
-                              required: true, message: 'Please input country zip code!',
-                            }]
+                              required: true, message: 'Please input country postal code!',
+                            }],
+                            initialValue: (customer.postal_code || '')
                           }
                         ]"
                         placeholder="23401"
@@ -152,18 +200,12 @@
              </a-row>
             <a-form-item>
               <a-checkbox
-                v-decorator="['billing-address', {valuePropName: 'checked'}]"
-              >
-                Shipping address is the same as my billing address
-              </a-checkbox>
-            </a-form-item>
-            <a-form-item>
-              <a-checkbox
-                v-decorator="['save-info', {valuePropName: 'checked'}]"
+                v-decorator="['saveInfo', {valuePropName: 'checked'}]"
               >
                 Save this information for next time
               </a-checkbox>
             </a-form-item>
+            <a-alert v-if="errorMessage" :message="errorMessage" type="error" showIcon />
             <a-form-item>
                <div class="action-buttons-space-between">
                  <a-button  class="action-button"  type="primary">
@@ -188,10 +230,10 @@
           ref="checkoutRef"
           :image="'https://fakeimg.pl/80x80'"
           :name="'Omedale'"
-          :description="'Payment'"
+          :description="description"
           :currency="'USD'"
-          :amount="20"
-          :email="'omedale@gmail.com'"
+          :amount="totalPayableAmount"
+          :email="customer.email || ''"
           :allow-remember-me="false"
           @done="done"
           @opened="opened"
@@ -204,6 +246,9 @@
 <script>
 import cartMixin from '@/mixins/cart'
 import ConfigService from '@/services/config'
+import OrderService from '@/services/order'
+import CustomerService from '@/services/customer'
+import CartService from '@/services/cart'
 import store from '@/store'
 export default {
   name: 'Checkout',
@@ -213,7 +258,15 @@ export default {
       shippings: [],
       form: this.$form.createForm(this),
       shippingId: 0,
-      shippingFee: 0
+      shippingFee: 0,
+      errorMessage: '',
+      loading: false,
+      description: 'My shop order payment'
+    }
+  },
+  computed: {
+    totalPayableAmount () {
+      return this.getTotal.getAmount()
     }
   },
   methods: {
@@ -226,14 +279,63 @@ export default {
       this.shippingId = shippingData.shipping_id
       this.shippingFee = shippingData.shipping_cost
     },
-    pay (e) {
+    makeOrder (e) {
       e.preventDefault()
-      const vm = this
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
-          vm.checkout()
+          this.loading = true
+          this.errorMessage = ''
+          if (values.saveInfo) {
+            this.updateAddress(values)
+          }
+          this.checkout()
         }
       })
+    },
+    async updateAddress (values) {
+      const regionData = JSON.parse(values.region)
+      const shippingData = JSON.parse(values.shipping)
+      const customerAddress = {
+        address_1: values.address,
+        address_2: values.address2,
+        city: values.city,
+        region: regionData.shipping_region,
+        postal_code: values.zip,
+        country: values.country,
+        shipping_region_id: shippingData.shipping_region_id
+      }
+      const response = await CustomerService.updateAddress(customerAddress)
+      if (response.status === 200 && response.data.customer_id) {
+        const customer = response.data
+        store.commit('UPDATE_CUSTOMER', { customer })
+      }
+    },
+    async createOrder (data, token) {
+      const response = await OrderService.order(data)
+      if (response.status === 200 && response.data.orderId) {
+        const data = {
+          stripeToken: token,
+          order_id: response.data.orderId,
+          'description': this.description,
+          'amount': Math.round(this.getTotal.getAmount() / 100)
+        }
+        this.chargeCustomer(data)
+      } else {
+        this.errorMessage = 'An error occur, please try again later'
+        // eslint-disable-next-line
+        return
+      }
+    },
+    async resetCart () {
+      const response = await CartService.generateUniqueCartId()
+      if (response.status === 200 && response.data.cart_id) {
+        const status = true
+        const cartId = response.data.cart_id
+        const carts = []
+        store.commit('UPDATE_CART_CONFIG', { cartId, status })
+        store.commit('ADD_CARTS', { carts })
+        this.$router.replace('/')
+      }
     },
     async getCheckOutData () {
       const response = await ConfigService.getCheckOutData()
@@ -242,23 +344,35 @@ export default {
         store.commit('ADD_CHECKOUT_DATA', { data })
       }
     },
-    async checkout () {
-      const { token, args } = await this.$refs.checkoutRef.open()
-      console.log(token)
-      console.log(args)
+    async chargeCustomer (data) {
+      const response = await OrderService.charge(data)
+      if (response.data && response.response.status === 'status') {
+      }
     },
-    done ({token, args}) {
-      console.log(token)
-      console.log(args)
+    async checkout () {
+      await this.$refs.checkoutRef.open()
+    },
+    done ({ token, args }) {
+      const data = {
+        cart_id: this.cartId,
+        shipping_id: this.shippingId,
+        tax_id: this.currentTaxId
+      }
+      this.createOrder(data, token.id)
+      this.resetCart()
+      this.loading = false
+      this.errorMessage = ''
     },
     opened () {
       // do stuff
     },
     closed () {
-      // do stuff
+      this.loading = false
+      this.errorMessage = ''
     },
     canceled () {
-      // do stuff
+      this.loading = false
+      this.errorMessage = ''
     }
   },
   created () {
