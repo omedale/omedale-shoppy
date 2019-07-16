@@ -11,36 +11,51 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col">Item</th>
-          <th scope="col">Size</th>
+          <th scope="col">Attributes</th>
           <th scope="col">Quantity</th>
           <th scope="col">Price</th>
           <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
-        <tr :key="item.id" v-for="(item, index) in data.items">
-          <th scope="row">{{index}}</th>
+        <tr :key="item.item_id" v-for="(item, index) in carts">
+          <th scope="row">{{(index + 1)}}</th>
           <td>
             <div class="item-preview">
-              <img :src="item.thumbnail" :alt="item.title" class="item-thumbnail">
+              <img :src="getImgUrl(item.thumbnail)" :alt="item.name" class="item-thumbnail">
               <div>
-                <h2 class="item-title">{{ item.title }}</h2>
+                <h2 class="item-title">{{ item.name }}</h2>
                 <p class="item-description">{{ item.description }}</p>
               </div>
             </div>
           </td>
           <td>
-            <a-badge
-              :key="size" v-for="size in item.sizes"
-              :count="size"
-              :numberStyle="{backgroundColor: '#fff', color: '#999', boxShadow: '0 0 0 1px #d9d9d9 inset'}" />
-          </td>
-          <td> <input type="text" class="item-quantity" v-model="item.quantity"></td>
-          <td>
-            <span>{{ toPrice(item.price).toFormat() }}</span>
+            <div v-if="(item.attributes).split(',')[0]">
+              <a-badge
+                :key="attribute" v-for="attribute in (item.attributes).split(',')"
+                :count="attribute"
+                :numberStyle="{backgroundColor: '#fff', color: '#999', boxShadow: '0 0 0 1px #d9d9d9 inset'}" />
+              </div>
           </td>
           <td>
-             <a-button shape="circle" icon="delete" />
+            <a-row size="small">
+              <a-col :span="3">
+                <a-button :disabled="loading"  shape="circle" @click="updateQuatity(item, -1)" icon="minus" :size="'small'" />
+              </a-col>
+              <a-col class="mr-2 ml-2" :span="6">
+                <a-input class="quantity" size="small" :disabled="true" v-model="item.quantity" type="number" min="0" defaultValue="0" />
+              </a-col>
+              <a-col :span="3">
+                <a-button :disabled="loading" class="" @click="updateQuatity(item, 1)" shape="circle" icon="plus" :size="'small'" />
+              </a-col>
+            </a-row>
+          </td>
+          <td>
+            <span v-if="item.discounted_price > 0">{{ toPrice(item.discounted_price).toFormat() }}</span>
+             <span v-else>{{ toPrice(item.price).toFormat() }}</span>
+          </td>
+          <td>
+             <a-button @click="removeItem(item.item_id)"  shape="circle" icon="delete" />
           </td>
         </tr>
         <tr>
@@ -48,12 +63,12 @@
           <td><h3 class="cart-line">Subtotal</h3></td>
           <td></td>
           <td></td>
-           <td><span class="cart-price">{{ getSubtotal.toFormat() }}</span></td>
+           <td><span class="cart-price"> {{ getSubtotal.toFormat() }}</span></td>
            <td></td>
         </tr>
         <tr>
            <th scope="row"></th>
-           <td><h3 class="cart-line"> VAT ({{ data.vatRate }}%)</h3></td>
+           <td><h3 class="cart-line"> Tax ({{ currentTaxRate }}%)</h3></td>
            <td></td>
            <td></td>
            <td> <span class="cart-price">{{ getTaxAmount.toFormat() }}</span></td>
@@ -88,75 +103,41 @@
 </template>
 
 <script>
-import Dinero from 'dinero.js'
+import cartMixin from '@/mixins/cart'
+import CartService from '@/services/cart'
+import ConfigService from '@/services/config'
+import store from '@/store'
 export default {
   name: 'Cart',
-  data () {
-    return {
-      data: {
-        items: [],
-        shippingPrice: 0,
-        vatRate: 0
-      },
-      language: 'en-US'
-    }
-  },
+  mixins: [cartMixin],
   methods: {
-    toPrice (amount, factor = Math.pow(10, 2)) {
-      return Dinero({ amount: Math.round(amount * factor) }).setLocale(
-        this.language
-      )
-    }
-  },
-  computed: {
-    getShippingPrice () {
-      return this.toPrice(this.data.shippingPrice)
+    getImgUrl (imageName) {
+      return require(`../../assets/product_images/${imageName}`)
     },
-    getTaxAmount () {
-      return this.getSubtotal.percentage(this.data.vatRate)
+    updateQuatity (item, value) {
+      const data = {
+        item_id: item.item_id,
+        product_id: item.product_id,
+        attributes: item.attributes
+      }
+      this.addOrUpdateCart(data, value)
     },
-    getSubtotal () {
-      return this.data.items.reduce(
-        (a, b) => a.add(this.toPrice(b.price).multiply(b.quantity)),
-        Dinero().setLocale(this.language)
-      )
+    async removeItem (itemId) {
+      const response = await CartService.removeProduct(itemId)
+      if (response.status === 200 && response.data) {
+        store.commit('REMOVE_CART', { itemId })
+      }
     },
-    getTotal () {
-      return this.getSubtotal.add(this.getTaxAmount).add(this.getShippingPrice)
+    async getCheckOutData () {
+      const response = await ConfigService.getCheckOutData()
+      if (response.status === 200 && response.data.tax) {
+        const data = response.data
+        store.commit('ADD_CHECKOUT_DATA', { data })
+      }
     }
   },
   created () {
-    this.data = {
-      items: [
-        {
-          title: 'Item 1',
-          description: 'A wonderful product',
-          thumbnail: 'https://fakeimg.pl/80x80',
-          sizes: ['XL', 'L', 'M'],
-          quantity: 3,
-          price: 20.01
-        },
-        {
-          title: 'Item 2',
-          description: 'A Great product',
-          thumbnail: 'https://fakeimg.pl/80x80',
-          sizes: ['L'],
-          quantity: 1,
-          price: 2.01
-        },
-        {
-          title: 'Item 3',
-          description: 'A Good product',
-          thumbnail: 'https://fakeimg.pl/80x80',
-          sizes: ['S', 'M'],
-          quantity: 2,
-          price: 10
-        }
-      ],
-      shippingPrice: 0,
-      vatRate: 20
-    }
-    console.log(this.data)
+    this.getCheckOutData()
   }
 }
 </script>
@@ -178,6 +159,10 @@ export default {
   font-size: 110%;
   font-weight: normal;
 }
+.quantity {
+  border-radius: 12px;
+  text-align: center;
+}
 .language {
   margin: 0 2px;
   font-size: 60%;
@@ -190,17 +175,17 @@ export default {
   padding: 0;
   list-style: none;
 }
+input {
+   border-radius: 12px !important;
+   max-width: 50px !important;
+}
 .cart {
   box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem !important;
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   color: #333a45;
   border-radius: 3px;
-  padding: 0.75rem;
-}
-input {
-   border-radius: 12px !important;
-   max-width: 50px !important;
+  padding: .75rem;
 }
 .cart-line {
   display: flex;

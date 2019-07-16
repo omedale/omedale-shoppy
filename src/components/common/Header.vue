@@ -5,13 +5,14 @@
       <div class="container">
         <div class="row align-items-center">
           <div class="flex-pull-left col-md-6 col-lg-6 col-sm-12">
-            <router-link :to="'/'" class="home py-1">
+            <router-link :to="'/'" class="home link py-1">
               <h3 class="primary-color">My Shop</h3>
             </router-link>
             <a-input-search
                   placeholder="search"
                   class="search-bar py-1"
                   :size="'small'"
+                  @change="onSearchChange"
                   @search="onSearch"
                 />
           </div>
@@ -24,13 +25,13 @@
               </span>
               <span v-else>
                 |
-                <span><router-link :to="'/customer/login'">Login</router-link></span> or
-                <span><router-link :to="'/customer/register'">Register</router-link></span>
+                <span><router-link :to="'/customer/login'" class="link">Login</router-link></span> or
+                <span><router-link :to="'/customer/register'" class="link">Register</router-link></span>
               </span>
               <span class="no-gutters cart py-1">
-                <router-link :to="'/cart'" class="">
+                <router-link :to="'/cart'" class="link">
                     <span>
-                      <a-badge :count="1"><a-avatar shape="square" icon="shopping-cart" /></a-badge>
+                      <a-badge :count="totalItem"><a-avatar shape="square" icon="shopping-cart" /></a-badge>
                     </span>
                 </router-link>
               </span>
@@ -46,22 +47,53 @@
 <script>
 import { mapGetters } from 'vuex'
 import store from '@/store'
+import productMixin from '@/mixins/product'
+import CartService from '@/services/cart'
 export default {
   name: 'header',
+  mixins: [productMixin],
   data () {
     return {
+      current: 1
     }
   },
   computed: {
-    ...mapGetters(['customer']),
+    ...mapGetters(['customer', 'isTokenValid', 'cartId', 'isValidCartId']),
     customerName () {
       return this.customer ? this.customer.name : ''
     }
   },
-  mounted () {
+  created () {
+    if (!this.isTokenValid) {
+      this.logout()
+    }
+    this.getCarts()
   },
   methods: {
-    onSearch (value) {
+    onSearch (searchWord) {
+      store.commit('UPDATE_SEARCH_WORD', { searchWord })
+      const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
+      this.findProdcut(this.searchWord, findType)
+      if (this.searchWord) {
+        this.$router.push({query: {
+          q: searchWord
+        }})
+      }
+    },
+    async getCarts () {
+      if (this.cartId && this.isValidCartId) {
+        const response = await CartService.getAllCartItem(this.cartId)
+        if (response.status === 200 && response.data) {
+          const carts = response.data
+          store.commit('ADD_CARTS', { carts })
+        }
+      }
+    },
+    onSearchChange (event) {
+      if (event.target.value === '') {
+        const searchWord = ''
+        store.commit('UPDATE_SEARCH_WORD', { searchWord })
+      }
     },
     logout () {
       const customer = null
@@ -100,10 +132,10 @@ export default {
     margin-right: 8px;
     height: 24px;
   }
-  a {
+  .link {
     color: #1DA57A;
   }
-  a:hover {
+  .link:hover {
      color: #3db389 !important;
   }
   .name {

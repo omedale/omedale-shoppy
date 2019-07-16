@@ -12,18 +12,17 @@
               <div class="product-name text-center">{{product.name}}</div>
             </a>
             <div class="price-wrap text-center">
-              <span class="price-new product-price"> ${{product.price}}</span>
+              <span v-if="product.discounted_price > 0" class="price-new discounted-product-price"> ${{product.discounted_price}}</span>
+              <span v-else class="price-new discounted-product-price"> ${{product.price}}</span>
             </div>
           </div>
           <div class="flex-space-between">
             <a-button class="pull-left" type="primary" shape="circle" icon="heart" :size="'small'" />
+              <span v-if="product.discounted_price > 0" class="price-new product-price"> ${{product.price}}</span>
             <a-button type="primary" class="pull-right" shape="circle" icon="shopping-cart" :size="'small'" />
           </div>
         </div>
     </div>
-    <div class="">
-
-     </div>
   </div>
 </div>
 </template>
@@ -47,42 +46,46 @@ export default {
 }
 </script>
 
- <style>
+<style>
 .product {
   background: #FFF;
   margin-bottom: 30px;
   position: relative;
   overflow: hidden;
 }
- .product-link {
+.product-link {
   display: block;
   color: #3D3D3D;
   cursor: pointer;
 }
- .product-link:hover {
+.product-link:hover {
   color: #3D3D3D;
   text-decoration: none;
 }
- .product .product-image {
+.product .product-image {
   width: 100%;
 }
- .product-image img {
+.product-image img {
   display: block;
   margin-left: auto;
   margin-right: auto;
   height: 225px;
 }
- .card-product {
+.card-product {
   padding: 0px 19px 18px 19px;
 }
- .product-info {
+.product-info {
   flex: 2;
 }
 .product-price {
   font-size: large;
+  text-decoration: line-through;
+}
+.discounted-product-price {
+  font-size: large;
   color: #1ca57a;
 }
- .product-name {
+.product-name {
   color: rgba(0, 0, 0, 0.65);
 }
 </style>
