@@ -48,7 +48,6 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    console.log(store.state.customer.customer)
     if (!store.state.customer.customer) {
       next({
         path: '/customer/login',
@@ -62,4 +61,4 @@ router.beforeEach((to, from, next) => {
   }
 })
 
- export default router
+export default router

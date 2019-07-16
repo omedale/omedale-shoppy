@@ -4,7 +4,7 @@ export default () => {
   return axios.create({
     baseURL: `http://localhost:8000/`,
     headers: {
-      'API-KEY': `Bearer ${store.state.customer.userToken}`
+      'API-KEY': `Bearer ${store.state.customer.token}`
     }
   })
 }
