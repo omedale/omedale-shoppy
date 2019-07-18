@@ -76,7 +76,7 @@ export default {
       }
       store.commit('UPDATE_SEARCH_WORD', { searchWord })
       const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
-      this.findProdcut(this.searchWord, findType)
+      this.findProducts(this.searchWord, findType)
       if (this.searchWord) {
         this.$router.push({ query: {
           q: searchWord

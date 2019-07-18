@@ -1,6 +1,7 @@
 <template>
 <div>
-  <div class="products">
+  <loader v-if="products.length < 1"></loader>
+  <div v-else class="products">
     <div class="row">
       <template v-for="product in products">
         <product-item @show-product-detail="showProductDetail" :key="product.id" :product="product"></product-item>
@@ -25,6 +26,7 @@
 import { mapGetters } from 'vuex'
 import ProductItem from './ProductItem.vue'
 import ProductDetail from './ProductDetail'
+import Loader from '../common/Loader'
 import productMixin from '@/mixins/product'
 import store from '@/store'
 export default {
@@ -39,7 +41,7 @@ export default {
       images: []
     }
   },
-  created () {
+  mounted () {
     const queryPage = this.$router.history.current.query.page || 1
     if (this.$router.history.current.query.q) {
       const searchWord = this.$router.history.current.query.q
@@ -55,8 +57,8 @@ export default {
     onPageChange (current) {
       this.current = current
       this.getProducts()
-      const query = this.searchWord ? {q: this.searchWord, page: this.current} : {page: this.current}
-      this.$router.push({query: query})
+      const query = this.searchWord ? { q: this.searchWord, page: this.current } : { page: this.current }
+      this.$router.push({ query: query })
     },
     showProductDetail (product) {
       this.images = []
@@ -71,7 +73,7 @@ export default {
     },
     getProducts () {
       const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
-      this.findProdcut(this.searchWord, findType)
+      this.findProducts(this.searchWord, findType)
     }
   },
   computed: {
@@ -79,7 +81,8 @@ export default {
   },
   components: {
     'product-item': ProductItem,
-    'product-detail': ProductDetail
+    'product-detail': ProductDetail,
+    'loader': Loader
   }
 }
 </script>

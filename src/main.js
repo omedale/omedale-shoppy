@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueStripeCheckout from 'vue-stripe-checkout'
 import {
   Button, Layout, Input, Icon, Checkbox, Modal, Carousel, Avatar,
-  Form, Menu, Radio, Select, Pagination, Row, Col, Table, Tag, Badge, Alert
+  Form, Menu, Radio, Select, Pagination, Row, Col, Table, Tag, Badge, Alert, Spin
 } from 'ant-design-vue'
 
 import store from './store'
@@ -28,6 +28,7 @@ Vue.use(Radio)
 Vue.use(Row)
 Vue.use(Pagination)
 Vue.use(Select)
+Vue.use(Spin)
 Vue.use(Table)
 Vue.use(Tag)
 

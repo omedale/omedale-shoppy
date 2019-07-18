@@ -8,7 +8,7 @@ export default {
       'isValidCartId'])
   },
   methods: {
-    async findProdcut (searchQuery = '', type) {
+    async findProducts (searchQuery = '', type) {
       const filter = {
         department_ids: this.filterByDepartmentIds,
         category_ids: this.filterByCategoryIds,
@@ -25,12 +25,12 @@ export default {
         const currentPage = this.current
         store.commit('ADD_PRODUCTS', { data, currentPage })
       }
-      const query = this.searchWord ? {q: this.searchWord, page: this.current} : {page: this.current}
-      this.$router.push({query: query})
+      const query = this.searchWord ? { q: this.searchWord, page: this.current } : { page: this.current }
+      this.$router.push({ query: query })
       this.isLoading = false
     },
     resetUrl () {
-      this.$router.replace({'query': null})
+      this.$router.replace({ 'query': null })
     }
   }
 }

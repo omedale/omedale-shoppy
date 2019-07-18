@@ -1,7 +1,7 @@
 <template>
-<div>
+<div class="main-app">
   <header-component></header-component>
-  <section class="">
+  <section class="main-content">
     <div class="container  content-wrapper">
       <router-view />
     </div>
@@ -35,5 +35,13 @@ export default {
     .content-wrapper {
       margin-top: 140px;
     }
+  }
+  .main-app {
+    position: relative;
+    height: 100vh;
+  }
+  .main-content {
+    height: 95vh;
+    overflow-y: scroll;
   }
 </style>

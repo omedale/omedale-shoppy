@@ -28,3 +28,10 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .section-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+</style>

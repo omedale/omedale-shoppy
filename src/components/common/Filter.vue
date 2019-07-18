@@ -89,7 +89,7 @@ export default {
       const departmentIds = this.departmentIds
       store.commit('UPDATE_FILTERS', { departmentIds, categoryIds, priceRange })
       const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
-      this.findProdcut(this.searchWord, findType)
+      this.findProducts(this.searchWord, findType)
     },
     clearFilter () {
       this.resetUrl()
@@ -99,7 +99,7 @@ export default {
       this.departmentIds = []
       store.commit('CLEAR_FILTER')
       const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
-      this.findProdcut(this.searchWord, findType)
+      this.findProducts(this.searchWord, findType)
     }
   },
   created () {
