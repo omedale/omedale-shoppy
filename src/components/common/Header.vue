@@ -12,6 +12,7 @@
                   placeholder="search"
                   class="search-bar py-1"
                   :size="'small'"
+                  v-model="searchKeys"
                   @change="onSearchChange"
                   @search="onSearch"
                 />
@@ -63,10 +64,11 @@ export default {
       return this.customer ? this.customer.name : ''
     }
   },
-  created () {
+  mounted () {
     if (!this.isTokenValid) {
       this.logout()
     }
+    this.updateSearchParams()
     this.getCarts()
   },
   methods: {

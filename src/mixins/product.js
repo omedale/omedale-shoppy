@@ -7,6 +7,11 @@ export default {
       'filterByPriceRange', 'filterByCategoryIds', 'filterByDepartmentIds', 'searchWord',
       'isValidCartId'])
   },
+  data () {
+    return {
+      searchKeys: ''
+    }
+  },
   methods: {
     async findProducts (searchQuery = '', type) {
       const filter = {
@@ -31,6 +36,16 @@ export default {
     },
     resetUrl () {
       this.$router.replace({ 'query': null })
+    },
+    updateSearchParams () {
+      if (this.$router.history.current.query.q) {
+        const searchWord = this.$router.history.current.query.q
+        this.searchKeys = searchWord
+        store.commit('UPDATE_SEARCH_WORD', { searchWord })
+      } else {
+        const searchWord = ''
+        store.commit('UPDATE_SEARCH_WORD', { searchWord })
+      }
     }
   }
 }

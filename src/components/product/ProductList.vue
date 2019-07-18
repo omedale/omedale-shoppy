@@ -28,7 +28,7 @@ import ProductItem from './ProductItem.vue'
 import ProductDetail from './ProductDetail'
 import Loader from '../common/Loader'
 import productMixin from '@/mixins/product'
-import store from '@/store'
+
 export default {
   name: 'product-list',
   mixins: [productMixin],
@@ -43,13 +43,7 @@ export default {
   },
   mounted () {
     const queryPage = this.$router.history.current.query.page || 1
-    if (this.$router.history.current.query.q) {
-      const searchWord = this.$router.history.current.query.q
-      store.commit('UPDATE_SEARCH_WORD', { searchWord })
-    } else {
-      const searchWord = ''
-      store.commit('UPDATE_SEARCH_WORD', { searchWord })
-    }
+    this.updateSearchParams()
     this.current = parseInt(queryPage)
     this.getProducts()
   },
