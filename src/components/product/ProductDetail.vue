@@ -45,9 +45,8 @@
             </div>
           </div>
            <div class="detail-filter-item">
-             <strong>Description</strong>
-              <p>{{product.description}}</p>
-              <a-button class="add-to-cart-btn" type="primary">Add to cart</a-button>
+            <strong>Description</strong>
+            <p>{{product.description}}</p>
            </div>
             <a-alert v-if="errorMessage" :message="errorMessage" type="error" showIcon />
             <div class="detail-filter-item">
