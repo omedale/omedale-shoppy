@@ -20,7 +20,6 @@
                 <img :src="getImgUrl(image)" />
               </div>
             </a-carousel>
-            <p>{{product.description}}</p>
         </div>
         <div class="col-md-6">
           <div class="detail-filter-item">
