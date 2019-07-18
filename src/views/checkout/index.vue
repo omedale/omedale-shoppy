@@ -346,7 +346,7 @@ export default {
     },
     async chargeCustomer (data) {
       const response = await OrderService.charge(data)
-      if (response.data && response.response.status === 'status') {
+      if (response.data && response.status === 'succeeded') {
       }
     },
     async checkout () {
