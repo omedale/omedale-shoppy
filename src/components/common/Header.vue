@@ -78,6 +78,7 @@ export default {
       }
       store.commit('UPDATE_SEARCH_WORD', { searchWord })
       const findType = this.searchWord ? 'SEARCH_PRODUCTS' : 'ALL_PRODUCTS'
+      store.commit('LOADING_PRODUCTS')
       this.findProducts(this.searchWord, findType)
       if (this.searchWord) {
         this.$router.push({ query: {

@@ -4,7 +4,7 @@ import store from '@/store'
 export default {
   computed: {
     ...mapGetters(['departments', 'categories', 'sizes', 'colors', 'totalItem',
-      'filterByPriceRange', 'filterByCategoryIds', 'filterByDepartmentIds', 'searchWord',
+      'filterByPriceRange', 'isProductLoading', 'filterByCategoryIds', 'filterByDepartmentIds', 'searchWord',
       'isValidCartId'])
   },
   data () {

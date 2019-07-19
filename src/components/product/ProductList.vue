@@ -1,13 +1,16 @@
 <template>
 <div>
-  <loader v-if="products.length < 1"></loader>
+  <loader v-if="isProductLoading"></loader>
   <div v-else class="products">
-    <div class="row">
+    <div v-if="products.length" class="row">
       <template v-for="product in products">
         <product-item @show-product-detail="showProductDetail" :key="product.id" :product="product"></product-item>
       </template>
     </div>
-    <div class="row pagination-wrapper">
+    <div class="no-products" v-else>
+      <h2>No available products</h2>
+    </div>
+    <div v-if="products.length" class="row pagination-wrapper">
        <a-pagination  :defaultCurrent="1" :pageSize="20" @change="onPageChange" :current="currentPage" :total="totalProducts" />
     </div>
   </div>
@@ -90,5 +93,9 @@ export default {
 }
 .pagination-wrapper {
   justify-content: center;
+}
+.no-products {
+  text-align: center;
+  margin-top: 10rem;
 }
 </style>
