@@ -31,7 +31,8 @@ describe('ProductList.vue', () => {
     state = {
       products: products.rows,
       count: products.count,
-      currentPage: 1
+      currentPage: 1,
+      isProductLoading: true
     }
     getters = {
       filterByCategoryIds: jest.fn(() => []),
@@ -42,7 +43,8 @@ describe('ProductList.vue', () => {
       sizes: jest.fn(() => []),
       colors: jest.fn(() => []),
       totalProducts: state => state.count,
-      currentPage: state => state.currentPage
+      currentPage: state => state.currentPage,
+      isProductLoading: jest.fn(() => false)
     }
     store = new Vuex.Store({
       actions,
